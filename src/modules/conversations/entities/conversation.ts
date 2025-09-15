@@ -36,3 +36,7 @@ export class Conversation {
 }
 
 export const ConversationSchema = SchemaFactory.createForClass(Conversation);
+
+ConversationSchema.path('participants').validate(function(value: Participant[]) {
+  return value && value.length > 0;
+}, 'participants array must contain at least one element');

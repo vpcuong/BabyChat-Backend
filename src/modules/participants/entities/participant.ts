@@ -1,24 +1,24 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { ObjectId, Document } from "mongoose";
 import { User } from "src/modules/users/entities/user";
-
+import { IsMongoId, IsOptional, IsDate, IsDefined, IsIn } from "class-validator";
+import { Transform, Type } from "class-transformer";
 // Define the Participant subdocument schema
-@Schema({ _id: false })
 export class Participant {
-  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true })
+  @IsMongoId()
   userId: User;
 
-  @Prop({ required: true }) // <-- Make role required
+  @IsDefined() // <-- Make role required
+  @IsIn(['admin', 'member', 'moderator'])
   role: string; // "admin", "member", "moderator"
 
-  @Prop({ required: true, default: Date.now})
-  joinedAt: Date;
+  @Transform(({ value }) => value ?? new Date())
+  @Type(() => Date)
+  @IsDate()
+  joinedAt?: Date = new Date(); 
 
-  @Prop({ required: true, default: null})
-  leftAt: Date;
-
-  @Prop({ default: true})
-  isActive: boolean;
+  @IsOptional()
+  @IsDate()
+  leftAt?: Date;
+  
+  @IsOptional()
+  isActive?: boolean;
 }
-
-export const ParticipantSchema = SchemaFactory.createForClass(Participant);

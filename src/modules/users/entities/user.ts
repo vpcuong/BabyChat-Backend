@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-//import { Document } from 'mongoose';
+import mongoose from 'mongoose';
+import { Conversation } from 'src/modules/conversations/entities/conversation';
 
 //export type UserDocument = User & Document;
 
@@ -11,6 +12,9 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
+  @Prop({ required: true })
+  password: string;
+
   @Prop({ required: false})
   displayName: string
 
@@ -19,6 +23,12 @@ export class User {
 
   @Prop({ default: Date.now })
   createdAt: Date;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: false })
+  listChats: Conversation[];
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: false })
+  listGroups: Conversation[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

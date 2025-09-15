@@ -13,7 +13,14 @@ export class UsersService {
   async getAllUsers(){
     return await this.userModel.find();
   }
+
+  async getUserById(id: string){
+    return await this.userModel.findById(id);
+  }
   
+  async findUserByEmail(email: string){
+    return await this.userModel.findOne({email: email});
+  }
   async createUser(createUserDto: CreateUserDto){
 
     const findUserByEmail = await this.userModel.findOne({ email: createUserDto.email})
@@ -23,5 +30,9 @@ export class UsersService {
     }
 
     return this.userModel.create(createUserDto);
+  }
+
+  deleteUser(id: string) {
+    return this.userModel.deleteOne({_id: id})
   }
 }

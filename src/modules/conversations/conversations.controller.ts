@@ -1,6 +1,7 @@
 import { ConversationsService } from './conversations.service';
-import { Body, Controller, Get, Post} from '@nestjs/common';
+import { Body, Controller, Get, Post, Param} from '@nestjs/common';
 import { CreateConvDto } from './dto/CreateConvDto';
+import { Participant } from '../participants/entities/participant';
 @Controller('conversations')
 export class ConversationsController {
 
@@ -8,10 +9,26 @@ export class ConversationsController {
   
   }
 
+  @Get()
+  async getAllConversations(){
+    return await this.convService.getAllConversations();
+  }
+
+  @Get(':id')
+  async getConversationById(@Param('id') id: string){
+    const conversation = await this.convService.getConversationById(id);
+    return conversation;
+  }
+
   @Post()
   create(@Body() createConvDto: CreateConvDto){
     console.log(createConvDto);
-    console.log(createConvDto.participants);
+    const par: Participant = {
+      userId: createConvDto.participants[0].userId,
+      role: 'admin',
+      joinedAt: new Date()
+    };
+    console.log(par);
     return this.convService.create(createConvDto);
   }
 }

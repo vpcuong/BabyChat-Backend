@@ -5,7 +5,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './modules/users/users.module';
 import { ConversationsModule } from './modules/conversations/conversations.module';
-
+import { AuthModule } from './modules/auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConfig } from '../jwt.config';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -18,8 +20,10 @@ import { ConversationsModule } from './modules/conversations/conversations.modul
       }),
       inject: [ConfigService],
     }),
+    JwtModule.register(jwtConfig),
     UserModule,
-    ConversationsModule
+    ConversationsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
