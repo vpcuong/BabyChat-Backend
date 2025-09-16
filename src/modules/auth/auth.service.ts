@@ -9,11 +9,11 @@ type ValidUser = {
 }
 @Injectable()
 export class AuthService {
-  constructor(private userService: UsersService, private jwtService: JwtService){ 
+  constructor(private userService: UsersService, private jwtService: JwtService) {
 
   }
 
-  async validateUser({email, password}): Promise<any> {
+  async validateUser({ email, password }): Promise<any> {
 
     const user = await this.userService.findUserByEmail(email);
 
@@ -22,7 +22,6 @@ export class AuthService {
     }
 
     if(await bcrypt.compare(password, user.password)){
-      
       const { password, ...result} = user.toObject();
       return result;
     }
@@ -40,14 +39,22 @@ export class AuthService {
       email: user.email, 
       sub: user._id,
       username: user.username,
-      roles: user.roles // Nếu có role-based authentication
+      roles: user.roles // FIXME: roles
     };
 
-    return {
-      access_token: this.jwtService.sign(payload),
+    const returnResult =  {
+      access_token: await this.jwtService.signAsync(payload),
       refresh_token: this.generateRefreshToken(payload), // Optional
       user: user,
     };
+
+    const checkPayload = this.jwtService.verify(returnResult.access_token);
+
+    if(!checkPayload){
+      throw new UnauthorizedException('Invalid token');
+    }
+
+    return returnResult;
   }
 
   async register(registerDto: { email: string; password: string; username: string }) {

@@ -7,7 +7,6 @@ import { UserModule } from './modules/users/users.module';
 import { ConversationsModule } from './modules/conversations/conversations.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConfig } from '../jwt.config';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,7 +19,28 @@ import { jwtConfig } from '../jwt.config';
       }),
       inject: [ConfigService],
     }),
-    JwtModule.register(jwtConfig),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => {
+        const secret = configService.get<string>('JWT_SECRET');
+        const expiresIn = configService.get<string>('JWT_ACCESS_TOKEN_EXPIRES');
+
+        if(!secret) {
+          throw new Error('JWT_SECRET is not defined');
+        }
+
+        if(!expiresIn) {
+          throw new Error('JWT_ACCESS_TOKEN_EXPIRES is not defined');
+        }
+
+        return {
+          secret: configService.get<string>('JWT_SECRET'), 
+          signOptions: { expiresIn: configService.get<string>('JWT_ACCESS_TOKEN_EXPIRES') }
+        } 
+      },
+      inject: [ConfigService],
+      global: true
+    }),
     UserModule,
     ConversationsModule,
     AuthModule,
