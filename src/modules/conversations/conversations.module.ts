@@ -3,8 +3,9 @@ import { ConversationsController } from './conversations.controller';
 import { ConversationsService } from './conversations.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConversationSchema, Conversation } from './entities/conversation';
-import { User } from '../users/entities/user';
 import { UserModule } from '../users/users.module';
+import { PageModule } from '../pages/page.module';
+import { MessageModule } from '../message/message.module';
 
 @Module({
   imports: [
@@ -14,7 +15,9 @@ import { UserModule } from '../users/users.module';
         schema: ConversationSchema 
       }
     ]),
-    UserModule
+    UserModule,
+    PageModule,
+    MessageModule
   ],
   controllers: [ConversationsController],
   providers: [ConversationsService]

@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateConvDto } from './dto/CreateConvDto';
 import { UsersService } from '../users/users.service';
+import { type CreateMessageDto } from '../message/dto/CreateMessageDto';
 @Injectable()
 export class ConversationsService {
 
@@ -41,5 +42,11 @@ export class ConversationsService {
 
   async getMine(userId: string) {
     return await this.convModel.find({participants: {$elemMatch: {userId: userId}}});
+  }
+
+  async sendMessage(senderId: string, createMessageDto: CreateMessageDto) {
+    //FIXME: validate conversation, sender....
+    console.log(senderId, createMessageDto)
+    return "message";
   }
 }

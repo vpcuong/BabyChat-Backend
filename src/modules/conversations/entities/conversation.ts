@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
-import mongoose, { ObjectId } from "mongoose";
+import mongoose from "mongoose";
 import { Participant } from "src/modules/participants/entities/participant";
 import { User } from "src/modules/users/entities/user";
 import { ConvSetting } from "./convSetting";

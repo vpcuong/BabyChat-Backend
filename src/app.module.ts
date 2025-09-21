@@ -7,6 +7,8 @@ import { UserModule } from './modules/users/users.module';
 import { ConversationsModule } from './modules/conversations/conversations.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { MessageModule } from './modules/message/message.module';
+import { PageModule } from './modules/pages/page.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -44,6 +46,8 @@ import { JwtModule } from '@nestjs/jwt';
     UserModule,
     ConversationsModule,
     AuthModule,
+    MessageModule,
+    PageModule
   ],
   controllers: [AppController],
   providers: [AppService],

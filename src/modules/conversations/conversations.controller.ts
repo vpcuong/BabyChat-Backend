@@ -3,11 +3,14 @@ import { Body, Controller, Get, Post, Param, UseGuards, Req, Request } from '@ne
 import { CreateConvDto } from './dto/CreateConvDto';
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import type { RequestWithUser } from 'src/common/types/RequestWithUser';
+import { MessageService } from '../message/message.service';
+import { PageService } from '../pages/page.service';
+import { type CreateMessageDto } from '../message/dto/CreateMessageDto';
 @UseGuards(JwtAuthGuard)
 @Controller('conversations')
 export class ConversationsController {
 
-  constructor(private convService: ConversationsService){
+  constructor(private convService: ConversationsService, private messageService: MessageService){
   
   }
 
@@ -33,5 +36,11 @@ export class ConversationsController {
   create(@Body() createConvDto: CreateConvDto, @Req() request: RequestWithUser){
     const createdBy = request.user;
     return this.convService.create(createdBy.userId, createConvDto);
+  }
+
+  @Post('/messages')
+  sendMessage(@Request() request: RequestWithUser, @Body() createMessageDto: CreateMessageDto){
+    const sender = request.user;
+    return this.convService.sendMessage(sender.userId, createMessageDto);
   }
 }
