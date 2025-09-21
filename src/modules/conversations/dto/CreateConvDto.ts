@@ -23,5 +23,5 @@ export class CreateConvDto {
   @Type(() => Participant)
   participants: Participant[];
   
-  createdBy: User;
+  createdBy: string;
 }

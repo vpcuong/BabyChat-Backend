@@ -4,7 +4,7 @@ import { Transform, Type } from "class-transformer";
 // Define the Participant subdocument schema
 export class Participant {
   @IsMongoId()
-  userId: User;
+  userId: string;
 
   @IsDefined() // <-- Make role required
   @IsIn(['admin', 'member', 'moderator'])
