@@ -4,6 +4,11 @@ import { Participant } from "src/modules/participants/entities/participant";
 import { User } from "src/modules/users/entities/user";
 import { ConvSetting } from "./convSetting";
 
+class PageInfo {
+  page: number
+  limit: number
+  list: mongoose.Types.ObjectId[]
+}
 @Schema()
 export class Conversation {
   @Prop({ required: true })
@@ -33,12 +38,8 @@ export class Conversation {
   updatedAt: Date;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Users' })
   createdBy: User;
-
-  pages: {
-    page: number,
-    limit: number,
-    list: mongoose.Schema.Types.ObjectId[]
-  }
+  @Prop({ required: true})
+  pages: PageInfo
 }
 
 export const ConversationSchema = SchemaFactory.createForClass(Conversation);

@@ -2,7 +2,7 @@ import { User } from "src/modules/users/entities/user";
 import { Participant } from "src/modules/participants/entities/participant";
 import { IsNotEmpty, IsString, IsArray, ArrayMinSize, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
-
+import mongoose from "mongoose";
 export class CreateConvDto {
 
   @IsString()
@@ -22,6 +22,12 @@ export class CreateConvDto {
   @ValidateNested({ each: true, always: true }) // Validates each participant object
   @Type(() => Participant)
   participants: Participant[];
+
+  pages: {
+    page: number,
+    limit: number,
+    list: mongoose.Types.ObjectId[]
+  }
   
   createdBy: string;
 }

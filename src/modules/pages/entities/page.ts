@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
 import mongoose from "mongoose";
+import { Message } from "../entities/message";
 @Schema()
 export class Page {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Conversation', required: true })
@@ -19,6 +20,8 @@ export class Page {
 
   @Prop()
   endTime: Date;
+  @Prop()
+  messages: Message[];
 
   createdAt?: Date;
   updatedAt?: Date;

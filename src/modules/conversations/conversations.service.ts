@@ -4,12 +4,13 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateConvDto } from './dto/CreateConvDto';
 import { UsersService } from '../users/users.service';
+import { PageService } from '../pages/page.service';
 import { type CreateMessageDto } from '../message/dto/CreateMessageDto';
 @Injectable()
 export class ConversationsService {
 
   constructor(@InjectModel(Conversation.name) private convModel: Model<Conversation>,
-    private userService: UsersService) {
+    private userService: UsersService, private pageService: PageService) {
 
   }
 
@@ -36,6 +37,11 @@ export class ConversationsService {
 
     createConvDto.createdBy = userId;
     createConvDto.participants.push({userId: userId, role: 'admin', joinedAt: new Date()});
+    createConvDto.pages = {
+      page: 0,
+      limit: 100,
+      list: []
+    }
 
     return await this.convModel.create(createConvDto);
   }
@@ -45,8 +51,31 @@ export class ConversationsService {
   }
 
   async sendMessage(senderId: string, createMessageDto: CreateMessageDto) {
-    //FIXME: validate conversation, sender....
-    console.log(senderId, createMessageDto)
+    const pages = await this.pageService.getPagesByConvId(createMessageDto.conversationId);
+    if (pages.length === 0) {
+      const newPage = await this.pageService.createNextPage(createMessageDto.conversationId);
+      try {
+        const updatedConversation = await this.convModel.findOneAndUpdate(
+          { _id: createMessageDto.conversationId },
+          {
+            $push: { 'pages.list': newPage.id },
+            $set: { 
+              'pages.page': newPage.pageNumber,
+              'isNew': false
+            }
+          },
+          { new: true } // This option returns the updated document
+        );
+        
+        if (!updatedConversation) {
+          throw new Error(`conversationId: ${createMessageDto.conversationId} not exists`);
+        }
+        
+        return updatedConversation;
+      } catch (error) {
+        throw new Error(`Failed to update conversation: ${error.message}`);
+      }
+    }
     return "message";
   }
 }

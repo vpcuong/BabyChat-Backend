@@ -13,6 +13,7 @@ import { Page, PageSchema } from '../pages/entities/page';
     ]),
   ],
   controllers: [PageController],
-  providers: [PageService]
+  providers: [PageService],
+  exports: [PageService],
 })
 export class PageModule {}
