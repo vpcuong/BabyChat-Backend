@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Conversation } from './entities/conversation';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateConvDto } from './dto/CreateConvDto';
 import { UsersService } from '../users/users.service';
 import { PageService } from '../pages/page.service';
 import { type CreateMessageDto } from '../message/dto/CreateMessageDto';
+import mongoose from 'mongoose';
 @Injectable()
 export class ConversationsService {
 
@@ -14,7 +15,7 @@ export class ConversationsService {
 
   }
 
-  getAllConversations(userId: string) {
+  getAllConversations(userId: mongoose.Types.ObjectId) {
     return this.convModel.find({participants: {$elemMatch: {userId: userId}}});
   }
 
@@ -22,7 +23,7 @@ export class ConversationsService {
     return await this.convModel.findOne({_id: id});
   }
 
-  async create(userId: string, createConvDto: CreateConvDto) {
+  async create(userId: mongoose.Types.ObjectId, createConvDto: CreateConvDto) {
     // validate and add new properties for participants
     for (const par of createConvDto.participants) {
       // validate participants
@@ -36,7 +37,7 @@ export class ConversationsService {
     }
 
     createConvDto.createdBy = userId;
-    createConvDto.participants.push({userId: userId, role: 'admin', joinedAt: new Date()});
+    createConvDto.participants.push({ userId: userId, role: 'admin', joinedAt: new Date()});
     createConvDto.pages = {
       page: 0,
       limit: 100,
@@ -46,15 +47,19 @@ export class ConversationsService {
     return await this.convModel.create(createConvDto);
   }
 
-  async getMine(userId: string) {
+  async getMine(userId: mongoose.Types.ObjectId) {
     return await this.convModel.find({participants: {$elemMatch: {userId: userId}}});
   }
 
-  async sendMessage(senderId: string, createMessageDto: CreateMessageDto) {
+  async sendMessage(senderId: mongoose.Types.ObjectId, createMessageDto: CreateMessageDto) {
     const pages = await this.pageService.getPagesByConvId(createMessageDto.conversationId);
-    if (pages.length === 0) {
+    let lastPageId: mongoose.Types.ObjectId | null = null;
+    const isPageFull = pages[pages.length - 1].messageCount >= pages[pages.length - 1].pageSize;
+    if (pages.length === 0 || isPageFull == true) {
+      // create new page
       const newPage = await this.pageService.createNextPage(createMessageDto.conversationId);
       try {
+        // add new page to conversation
         const updatedConversation = await this.convModel.findOneAndUpdate(
           { _id: createMessageDto.conversationId },
           {
@@ -71,11 +76,19 @@ export class ConversationsService {
           throw new Error(`conversationId: ${createMessageDto.conversationId} not exists`);
         }
         
-        return updatedConversation;
+        lastPageId = updatedConversation.pages.list[updatedConversation.pages.list.length - 1];
       } catch (error) {
         throw new Error(`Failed to update conversation: ${error.message}`);
       }
     }
-    return "message";
+    else{
+      // get last page
+      lastPageId = pages[pages.length - 1]._id;
+    }
+
+    // add message to page
+    const newMessage = await this.pageService.addMessageToPage(lastPageId, senderId, createMessageDto);
+
+    return newMessage;
   }
 }

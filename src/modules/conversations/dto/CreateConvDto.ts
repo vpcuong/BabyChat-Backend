@@ -29,5 +29,5 @@ export class CreateConvDto {
     list: mongoose.Types.ObjectId[]
   }
   
-  createdBy: string;
+  createdBy: mongoose.Types.ObjectId;
 }

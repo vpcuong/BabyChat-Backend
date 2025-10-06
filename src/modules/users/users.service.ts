@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { User} from './entities/user';
 import { InjectModel } from '@nestjs/mongoose';
 import { BusinessException } from 'src/common/exceptions/business-exceptions';
-
+import mongoose from 'mongoose';
 @Injectable()
 export class UsersService {
 
@@ -14,7 +14,7 @@ export class UsersService {
     return await this.userModel.find();
   }
 
-  async getUserById(id: string): Promise<User | undefined | null>{
+  async getUserById(id: mongoose.Types.ObjectId): Promise<User | undefined | null>{
     return await this.userModel.findById(id);
   }
   
@@ -32,7 +32,7 @@ export class UsersService {
     return this.userModel.create(createUserDto);
   }
 
-  deleteUser(id: string) {
+  deleteUser(id: mongoose.Types.ObjectId){
     return this.userModel.deleteOne({_id: id})
   }
 }

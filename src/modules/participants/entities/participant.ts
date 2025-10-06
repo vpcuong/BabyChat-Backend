@@ -1,10 +1,11 @@
 import { User } from "src/modules/users/entities/user";
 import { IsMongoId, IsOptional, IsDate, IsDefined, IsIn } from "class-validator";
 import { Transform, Type } from "class-transformer";
+import mongoose from "mongoose";
 // Define the Participant subdocument schema
 export class Participant {
   @IsMongoId()
-  userId: string;
+  userId: mongoose.Types.ObjectId;
 
   @IsDefined() // <-- Make role required
   @IsIn(['admin', 'member', 'moderator'])

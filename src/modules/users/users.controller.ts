@@ -1,6 +1,7 @@
 import { UsersService } from './users.service';
 import { Body, Controller, Delete, Get, Post, Param} from '@nestjs/common';
 import { CreateUserDto } from './dto/CreateUserDto';
+import mongoose from 'mongoose';
 
 @Controller('users')
 export class UsersController {
@@ -15,7 +16,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  getUserById(@Param('id') id: string){
+  getUserById(@Param('id') id: mongoose.Types.ObjectId){
     return this.userService.getUserById(id);
   }
 
@@ -26,7 +27,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  async deleteUser(@Param('id') id: string){
+  async deleteUser(@Param('id') id: mongoose.Types.ObjectId){
     return await this.userService.deleteUser(id);
   }
 }
