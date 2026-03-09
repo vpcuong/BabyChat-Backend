@@ -62,7 +62,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     this.logger.error(
       `${request.method} ${request.url} ${message}`,
       // exception instanceof Error ? exception.stack : exception,
-      GlobalExceptionFilter.name,
     );
 
     // Send error response

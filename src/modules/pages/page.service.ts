@@ -5,6 +5,7 @@ import { Page } from './entities/page';
 import { CreatePageDto } from './dto/CreatePageDto';
 import { type CreateMessageDto } from '../message/dto/CreateMessageDto';
 import mongoose from 'mongoose';
+import { Message } from './entities/message';
 @Injectable()
 export class PageService {
 
@@ -51,4 +52,11 @@ export class PageService {
     return this.pageModel.findOneAndUpdate({ _id: pageId }, page, { new: true });
   }
 
+  async getMessagesByPageNumber(convId: mongoose.Types.ObjectId, pageNum: Number): Promise<Message[]>{ 
+    const page = await this.pageModel
+    .findOne({ conversationId: convId, pageNumber: pageNum })
+    .lean();
+  
+    return page?.messages || []
+  }
 }

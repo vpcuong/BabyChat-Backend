@@ -1,10 +1,11 @@
-import { User } from "src/modules/users/entities/user";
-import { IsMongoId, IsOptional, IsDate, IsDefined, IsIn } from "class-validator";
+import { IsOptional, IsDate, IsDefined, IsIn } from "class-validator";
 import { Transform, Type } from "class-transformer";
 import mongoose from "mongoose";
+import { Prop, Schema } from "@nestjs/mongoose";
 // Define the Participant subdocument schema
+@Schema()
 export class Participant {
-  @IsMongoId()
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Users' })
   userId: mongoose.Types.ObjectId;
 
   @IsDefined() // <-- Make role required
@@ -20,6 +21,6 @@ export class Participant {
   @IsDate()
   leftAt?: Date;
   
-  @IsOptional()
+  @Prop({ default: false })
   isActive?: boolean;
 }

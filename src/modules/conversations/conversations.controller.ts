@@ -6,6 +6,7 @@ import type { RequestWithUser } from 'src/common/types/RequestWithUser';
 import { MessageService } from '../message/message.service';
 import { PageService } from '../pages/page.service';
 import { type CreateMessageDto } from '../message/dto/CreateMessageDto';
+import mongoose, { MongooseBaseQueryOptionKeys } from 'mongoose';
 @UseGuards(JwtAuthGuard)
 @Controller('conversations')
 export class ConversationsController {
@@ -42,5 +43,15 @@ export class ConversationsController {
   sendMessage(@Request() request: RequestWithUser, @Body() createMessageDto: CreateMessageDto){
     const sender = request.user;
     return this.convService.sendMessage(sender.userId, createMessageDto);
+  }
+
+  @Get('/messages/:conversationId/:pageNum')
+  getMessages(@Param('conversationId') conversationId: mongoose.Types.ObjectId, @Param('pageNum') pageNum: Number){
+    return this.convService.getMessageByPageNumber(conversationId, pageNum);
+  }
+
+  @Get(':id/pages/')
+  getPages(@Param('id') conversationId: mongoose.Types.ObjectId){
+    return this.convService.getPageList(conversationId);
   }
 }

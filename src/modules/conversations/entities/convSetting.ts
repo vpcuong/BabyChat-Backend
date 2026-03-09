@@ -1,16 +1,17 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
-import mongoose, { ObjectId } from "mongoose";
+import mongoose from "mongoose";
 
 @Schema()
 export class ConvSetting {
   @Prop({ required: true })
-  isPrivate: Boolean
+  isPrivate: boolean
   @Prop({ required: true })
-  allowInvites: Boolean
-  @Prop({ required: false })   // can members invite others?
-  mutedBy: [ObjectId] // users who muted this conversation
-  @Prop({ required: false })
-  pinnedBy: [ObjectId] // users who pinned this conversation
+  allowInvites: boolean
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Users' }], default: [] })
+  mutedBy: mongoose.Types.ObjectId[] // users who muted this conversation
+
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Users' }], default: [] })
+  pinnedBy: mongoose.Types.ObjectId[] // users who pinned this conversation
 };
 
 export const ConvSettingSchema = SchemaFactory.createForClass(ConvSetting);

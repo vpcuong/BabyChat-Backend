@@ -1,20 +1,22 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
 import mongoose from "mongoose";
 import { Participant } from "src/modules/participants/entities/participant";
-import { User } from "src/modules/users/entities/user";
 import { ConvSetting } from "./convSetting";
-
+@Schema({ _id: false })
 class PageInfo {
+  @Prop({ required: true })
   page: number
+  @Prop({ required: true })
   limit: number
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Pages' }], default: [] })
   list: mongoose.Types.ObjectId[]
 }
-@Schema()
+@Schema({ timestamps: true })
 export class Conversation {
-  @Prop({ required: true })
+  @Prop({ required: true, enum: ['direct', 'group', 'channel'] })
   type: string; // "direct", "group", "channel"
 
-  @Prop({ required: false})
+  @Prop({ required: false })
   name: string // null for direct messages, required for groups
 
   @Prop({ required: false })
@@ -32,12 +34,8 @@ export class Conversation {
   settings: ConvSetting;
 
   // Metadata
-  @Prop({required: false, default: Date.now})
-  createdAt: Date;
-  @Prop({required: false, default: Date.now})
-  updatedAt: Date;
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Users' })
-  createdBy: User;
+  createdBy: mongoose.Types.ObjectId;
   @Prop({ required: true})
   pages: PageInfo
 }

@@ -9,7 +9,6 @@ import { type CreateMessageDto } from '../message/dto/CreateMessageDto';
 import mongoose from 'mongoose';
 @Injectable()
 export class ConversationsService {
-
   constructor(@InjectModel(Conversation.name) private convModel: Model<Conversation>,
     private userService: UsersService, private pageService: PageService) {
 
@@ -90,5 +89,15 @@ export class ConversationsService {
     const newMessage = await this.pageService.addMessageToPage(lastPageId, senderId, createMessageDto);
 
     return newMessage;
+  }
+
+
+  getMessageByPageNumber(conversationId: mongoose.Types.ObjectId, pageNum: Number) {
+    return this.pageService.getMessagesByPageNumber(conversationId, pageNum);
+  }
+
+  async getPageList(conversationId: mongoose.Types.ObjectId) {
+    const pages = await this.convModel.findOne({ _id: conversationId }).select('pages');
+    return pages;
   }
 }
