@@ -3,17 +3,18 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { UserModule } from './modules/users/users.module';
 import { ConversationsModule } from './modules/conversations/conversations.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { JwtModule } from '@nestjs/jwt';
 import { MessageModule } from './modules/message/message.module';
 import { PageModule } from './modules/pages/page.module';
+import { EventBus, EVENT_BUS } from './infrastructure/events/event-bus';
+
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -26,30 +27,26 @@ import { PageModule } from './modules/pages/page.module';
       useFactory: (configService: ConfigService) => {
         const secret = configService.get<string>('JWT_SECRET');
         const expiresIn = configService.get<string>('JWT_ACCESS_TOKEN_EXPIRES');
-
-        if(!secret) {
-          throw new Error('JWT_SECRET is not defined');
-        }
-
-        if(!expiresIn) {
-          throw new Error('JWT_ACCESS_TOKEN_EXPIRES is not defined');
-        }
-
-        return {
-          secret: configService.get<string>('JWT_SECRET'), 
-          signOptions: { expiresIn: configService.get<string>('JWT_ACCESS_TOKEN_EXPIRES') }
-        } 
+        if (!secret) throw new Error('JWT_SECRET is not defined');
+        if (!expiresIn) throw new Error('JWT_ACCESS_TOKEN_EXPIRES is not defined');
+        return { secret, signOptions: { expiresIn }, global: true };
       },
       inject: [ConfigService],
-      global: true
+      global: true,
     }),
+    EventEmitterModule.forRoot(),
     UserModule,
     ConversationsModule,
     AuthModule,
     MessageModule,
-    PageModule
+    PageModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: EVENT_BUS, useClass: EventBus },
+    EventBus,
+  ],
+  exports: [EVENT_BUS],
 })
 export class AppModule {}

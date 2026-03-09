@@ -1,57 +1,76 @@
-import { ConversationsService } from './conversations.service';
-import { Body, Controller, Get, Post, Param, UseGuards, Req, Request } from '@nestjs/common';
-import { CreateConvDto } from './dto/CreateConvDto';
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { Body, Controller, Get, Post, Param, UseGuards, Request } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { RequestWithUser } from 'src/common/types/RequestWithUser';
-import { MessageService } from '../message/message.service';
-import { PageService } from '../pages/page.service';
-import { type CreateMessageDto } from '../message/dto/CreateMessageDto';
-import mongoose, { MongooseBaseQueryOptionKeys } from 'mongoose';
+import { CreateConversationUseCase } from 'src/application/conversation/use-cases/create-conversation.usecase';
+import { SendMessageUseCase } from 'src/application/conversation/use-cases/send-message.usecase';
+import {
+  GetConversationsByUserUseCase,
+  GetConversationByIdUseCase,
+  GetMessagesByPageUseCase,
+  GetPageListUseCase,
+} from 'src/application/conversation/use-cases/get-conversation.usecase';
+import { CreateConvDto } from './dto/CreateConvDto';
+import { CreateMessageDto } from '../message/dto/CreateMessageDto';
+
 @UseGuards(JwtAuthGuard)
 @Controller('conversations')
 export class ConversationsController {
-
-  constructor(private convService: ConversationsService, private messageService: MessageService){
-  
-  }
+  constructor(
+    private readonly createConversationUseCase: CreateConversationUseCase,
+    private readonly sendMessageUseCase: SendMessageUseCase,
+    private readonly getConversationsByUserUseCase: GetConversationsByUserUseCase,
+    private readonly getConversationByIdUseCase: GetConversationByIdUseCase,
+    private readonly getMessagesByPageUseCase: GetMessagesByPageUseCase,
+    private readonly getPageListUseCase: GetPageListUseCase,
+  ) {}
 
   @Get()
-  async getAllConversations(@Request() request: RequestWithUser){
-    const userId = request.user.userId;
-    return await this.convService.getAllConversations(userId);
+  getAllConversations(@Request() request: RequestWithUser) {
+    return this.getConversationsByUserUseCase.execute(request.user.userId);
   }
 
   @Get('/mine')
-  getMine(@Req() request: RequestWithUser){
-    const userId = request.user.userId;
-    return this.convService.getMine(userId);
+  getMine(@Request() request: RequestWithUser) {
+    return this.getConversationsByUserUseCase.execute(request.user.userId);
   }
 
   @Get(':id')
-  async getConversationById(@Param('id') id: string){
-    const conversation = await this.convService.getConversationById(id);
-    return conversation;
+  getConversationById(@Param('id') id: string) {
+    return this.getConversationByIdUseCase.execute(id);
   }
 
   @Post()
-  create(@Body() createConvDto: CreateConvDto, @Req() request: RequestWithUser){
-    const createdBy = request.user;
-    return this.convService.create(createdBy.userId, createConvDto);
+  createConversation(@Body() dto: CreateConvDto, @Request() request: RequestWithUser) {
+    return this.createConversationUseCase.execute({
+      type: dto.type as any,
+      createdByUserId: request.user.userId,
+      participantUserIds: dto.participants.map((p) => p.userId.toString()),
+      name: dto.name,
+      description: dto.description,
+      avatar: dto.avatar,
+    });
   }
 
   @Post('/messages')
-  sendMessage(@Request() request: RequestWithUser, @Body() createMessageDto: CreateMessageDto){
-    const sender = request.user;
-    return this.convService.sendMessage(sender.userId, createMessageDto);
+  sendMessage(@Request() request: RequestWithUser, @Body() dto: CreateMessageDto) {
+    return this.sendMessageUseCase.execute({
+      conversationId: dto.conversationId.toString(),
+      senderId: request.user.userId,
+      content: dto.content,
+      replyId: dto.replyId?.toString(),
+    });
   }
 
   @Get('/messages/:conversationId/:pageNum')
-  getMessages(@Param('conversationId') conversationId: mongoose.Types.ObjectId, @Param('pageNum') pageNum: Number){
-    return this.convService.getMessageByPageNumber(conversationId, pageNum);
+  getMessages(
+    @Param('conversationId') conversationId: string,
+    @Param('pageNum') pageNum: string,
+  ) {
+    return this.getMessagesByPageUseCase.execute(conversationId, Number(pageNum));
   }
 
-  @Get(':id/pages/')
-  getPages(@Param('id') conversationId: mongoose.Types.ObjectId){
-    return this.convService.getPageList(conversationId);
+  @Get(':id/pages')
+  getPages(@Param('id') conversationId: string) {
+    return this.getPageListUseCase.execute(conversationId);
   }
 }

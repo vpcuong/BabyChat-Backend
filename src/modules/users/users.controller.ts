@@ -1,33 +1,28 @@
-import { UsersService } from './users.service';
-import { Body, Controller, Delete, Get, Post, Param} from '@nestjs/common';
-import { CreateUserDto } from './dto/CreateUserDto';
-import mongoose from 'mongoose';
+import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { GetAllUsersUseCase, GetUserByIdUseCase, DeleteUserUseCase } from 'src/application/user/use-cases/get-users.usecase';
 
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
-
-  constructor(private userService: UsersService){
-
-  }
+  constructor(
+    private readonly getAllUsersUseCase: GetAllUsersUseCase,
+    private readonly getUserByIdUseCase: GetUserByIdUseCase,
+    private readonly deleteUserUseCase: DeleteUserUseCase,
+  ) {}
 
   @Get()
-  getAllUsers(){
-    return this.userService.getAllUsers();
+  getAllUsers() {
+    return this.getAllUsersUseCase.execute();
   }
 
   @Get(':id')
-  getUserById(@Param('id') id: mongoose.Types.ObjectId){
-    return this.userService.getUserById(id);
-  }
-
-  @Post()
-  createUser(@Body() createUserDto: CreateUserDto){
-    console.log(createUserDto);
-    return this.userService.createUser(createUserDto);
+  getUserById(@Param('id') id: string) {
+    return this.getUserByIdUseCase.execute(id);
   }
 
   @Delete(':id')
-  async deleteUser(@Param('id') id: mongoose.Types.ObjectId){
-    return await this.userService.deleteUser(id);
+  deleteUser(@Param('id') id: string) {
+    return this.deleteUserUseCase.execute(id);
   }
 }

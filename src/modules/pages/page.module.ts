@@ -1,19 +1,20 @@
 import { Module } from '@nestjs/common';
-import { PageController } from './page.controller';
-import { PageService } from './page.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Page, PageSchema } from '../pages/entities/page';
+import { PageDocument, PageSchema } from 'src/infrastructure/persistence/schemas/page.schema';
+import { PageRepository } from 'src/infrastructure/persistence/repositories/page.repository';
+import { IPageRepository } from 'src/domain/message/repositories/i-page.repository';
+import { PageService } from './page.service';
+import { PageController } from './page.controller';
+
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { 
-        name: Page.name, 
-        schema: PageSchema 
-      }
-    ]),
+    MongooseModule.forFeature([{ name: PageDocument.name, schema: PageSchema }]),
   ],
   controllers: [PageController],
-  providers: [PageService],
-  exports: [PageService],
+  providers: [
+    PageService,
+    { provide: IPageRepository, useClass: PageRepository },
+  ],
+  exports: [IPageRepository, PageService],
 })
 export class PageModule {}
