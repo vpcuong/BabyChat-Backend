@@ -5,73 +5,73 @@ import mongoose from 'mongoose';
 @Schema({ _id: false })
 class ParticipantSubdoc {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-  userId: mongoose.Types.ObjectId;
+  declare userId: mongoose.Types.ObjectId;
 
   @Prop({ required: true, enum: ['admin', 'member', 'moderator'] })
-  role: string;
+  declare role: string;
 
   @Prop({ default: Date.now })
-  joinedAt: Date;
+  declare joinedAt: Date;
 
   @Prop()
-  leftAt?: Date;
+  declare leftAt?: Date;
 
   @Prop({ default: false })
-  isActive: boolean;
+  declare isActive: boolean;
 }
 
 @Schema({ _id: false })
 class ConvSettingSubdoc {
   @Prop({ default: false })
-  isPrivate: boolean;
+  declare isPrivate: boolean;
 
   @Prop({ default: true })
-  allowInvites: boolean;
+  declare allowInvites: boolean;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], default: [] })
-  mutedBy: mongoose.Types.ObjectId[];
+  declare mutedBy: mongoose.Types.ObjectId[];
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], default: [] })
-  pinnedBy: mongoose.Types.ObjectId[];
+  declare pinnedBy: mongoose.Types.ObjectId[];
 }
 
 @Schema({ _id: false })
 class PageInfoSubdoc {
   @Prop({ default: 0 })
-  page: number;
+  declare page: number;
 
   @Prop({ default: 100 })
-  limit: number;
+  declare limit: number;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Page' }], default: [] })
-  list: mongoose.Types.ObjectId[];
+  declare list: mongoose.Types.ObjectId[];
 }
 
 @Schema({ timestamps: true })
 export class ConversationDocument extends Document {
   @Prop({ required: true, enum: ['direct', 'group', 'channel'] })
-  type: string;
+  declare type: string;
 
   @Prop({ required: false })
-  name?: string;
+  declare name?: string;
 
   @Prop({ required: false })
-  description?: string;
+  declare description?: string;
 
   @Prop({ required: false })
-  avatar?: string;
+  declare avatar?: string;
 
   @Prop({ type: [ParticipantSubdoc], required: true, default: [] })
-  participants: ParticipantSubdoc[];
+  declare participants: ParticipantSubdoc[];
 
   @Prop({ type: ConvSettingSubdoc, required: false })
-  settings?: ConvSettingSubdoc;
+  declare settings?: ConvSettingSubdoc;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-  createdBy: mongoose.Types.ObjectId;
+  declare createdBy: mongoose.Types.ObjectId;
 
   @Prop({ type: PageInfoSubdoc, required: true })
-  pages: PageInfoSubdoc;
+  declare pages: PageInfoSubdoc;
 }
 
 export const ConversationSchema = SchemaFactory.createForClass(ConversationDocument);

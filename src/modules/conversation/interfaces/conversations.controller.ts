@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, Param, UseGuards, Request } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/interfaces/guards/jwt-auth.guard';
 import type { RequestWithUser } from 'src/shared/types/request-with-user';
 import { CreateConversationUseCase } from 'src/modules/conversation/application/use-cases/create-conversation.usecase';
@@ -12,6 +13,8 @@ import {
 import { CreateConvDto } from './dto/create-conv.dto';
 import { CreateMessageDto } from 'src/modules/message/interfaces/dto/create-message.dto';
 
+@ApiTags('conversations')
+@ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard)
 @Controller('conversations')
 export class ConversationsController {
@@ -24,6 +27,7 @@ export class ConversationsController {
     private readonly getPageListUseCase: GetPageListUseCase,
   ) {}
 
+  @ApiOperation({ summary: 'Lấy danh sách hội thoại của user' })
   @Get()
   getAllConversations(@Request() request: RequestWithUser) {
     return this.getConversationsByUserUseCase.execute(request.user.userId);
@@ -34,11 +38,13 @@ export class ConversationsController {
     return this.getConversationsByUserUseCase.execute(request.user.userId);
   }
 
+  @ApiOperation({ summary: 'Lấy hội thoại theo ID' })
   @Get(':id')
   getConversationById(@Param('id') id: string) {
     return this.getConversationByIdUseCase.execute(id);
   }
 
+  @ApiOperation({ summary: 'Tạo hội thoại mới' })
   @Post()
   createConversation(@Body() dto: CreateConvDto, @Request() request: RequestWithUser) {
     return this.createConversationUseCase.execute({
@@ -51,6 +57,7 @@ export class ConversationsController {
     });
   }
 
+  @ApiOperation({ summary: 'Gửi tin nhắn trong hội thoại' })
   @Post('/messages')
   sendMessage(@Request() request: RequestWithUser, @Body() dto: CreateMessageDto) {
     return this.sendMessageUseCase.execute({
@@ -61,6 +68,7 @@ export class ConversationsController {
     });
   }
 
+  @ApiOperation({ summary: 'Lấy tin nhắn theo trang' })
   @Get('/messages/:conversationId/:pageNum')
   getMessages(
     @Param('conversationId') conversationId: string,
@@ -69,6 +77,7 @@ export class ConversationsController {
     return this.getMessagesByPageUseCase.execute(conversationId, Number(pageNum));
   }
 
+  @ApiOperation({ summary: 'Lấy danh sách trang của hội thoại' })
   @Get(':id/pages')
   getPages(@Param('id') conversationId: string) {
     return this.getPageListUseCase.execute(conversationId);

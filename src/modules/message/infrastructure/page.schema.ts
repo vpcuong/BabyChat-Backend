@@ -5,46 +5,46 @@ import mongoose from 'mongoose';
 @Schema({ _id: true })
 class MessageSubdoc {
   @Prop({ type: mongoose.Schema.Types.ObjectId, auto: true })
-  _id: mongoose.Types.ObjectId;
+  declare _id: mongoose.Types.ObjectId;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-  senderId: mongoose.Types.ObjectId;
+  declare senderId: mongoose.Types.ObjectId;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Message', default: null })
-  replyId?: mongoose.Types.ObjectId;
+  declare replyId?: mongoose.Types.ObjectId;
 
   @Prop({ required: true })
-  content: string;
+  declare content: string;
 
   @Prop({ default: Date.now })
-  createdAt: Date;
+  declare createdAt: Date;
 
   @Prop({ default: Date.now })
-  updatedAt: Date;
+  declare updatedAt: Date;
 }
 
 @Schema({ timestamps: true })
 export class PageDocument extends Document {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Conversation', required: true })
-  conversationId: mongoose.Types.ObjectId;
+  declare conversationId: mongoose.Types.ObjectId;
 
   @Prop({ required: true, min: 1 })
-  pageNumber: number;
+  declare pageNumber: number;
 
   @Prop({ default: 50, min: 1, max: 100 })
-  pageSize: number;
+  declare pageSize: number;
 
   @Prop({ default: 0, min: 0 })
-  messageCount: number;
+  declare messageCount: number;
 
   @Prop({ default: Date.now })
-  startTime: Date;
+  declare startTime: Date;
 
   @Prop()
-  endTime?: Date;
+  declare endTime?: Date;
 
   @Prop({ type: [MessageSubdoc], default: [] })
-  messages: MessageSubdoc[];
+  declare messages: MessageSubdoc[];
 }
 
 export const PageSchema = SchemaFactory.createForClass(PageDocument);
