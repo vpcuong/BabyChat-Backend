@@ -1,13 +1,6 @@
-import { Body, Controller, Get, Post, Param, UseGuards, Req, Request } from '@nestjs/common';
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
-import type { RequestWithUser } from 'src/common/types/RequestWithUser';
-import { PageService } from './page.service';
+import { Controller, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+
 @UseGuards(JwtAuthGuard)
 @Controller('pages')
-export class PageController {
-
-  constructor(private pageService: PageService) {
-    
-  }
-
-}
+export class PageController {}

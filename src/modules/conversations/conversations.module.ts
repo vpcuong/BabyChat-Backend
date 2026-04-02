@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConversationsController } from './conversations.controller';
-import { ConversationsService } from './conversations.service';
 import { ConversationDocument, ConversationSchema } from 'src/infrastructure/persistence/schemas/conversation.schema';
 import { ConversationRepository } from 'src/infrastructure/persistence/repositories/conversation.repository';
 import { IConversationRepository } from 'src/domain/conversation/repositories/i-conversation.repository';
@@ -27,7 +26,6 @@ import { EventBus, EVENT_BUS } from 'src/infrastructure/events/event-bus';
   ],
   controllers: [ConversationsController],
   providers: [
-    ConversationsService,
     { provide: IConversationRepository, useClass: ConversationRepository },
     { provide: EVENT_BUS, useClass: EventBus },
     CreateConversationUseCase,
