@@ -5,12 +5,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { UserModule } from './modules/users/users.module';
-import { ConversationsModule } from './modules/conversations/conversations.module';
-import { AuthModule } from './modules/auth/auth.module';
-import { MessageModule } from './modules/message/message.module';
-import { PageModule } from './modules/pages/page.module';
-import { EventBus, EVENT_BUS } from './infrastructure/events/event-bus';
+import { UserModule } from './modules/user/interfaces/users.module';
+import { ConversationsModule } from './modules/conversation/interfaces/conversations.module';
+import { AuthModule } from './modules/auth/interfaces/auth.module';
+import { MessageModule } from './modules/message/interfaces/message.module';
+import { PageModule } from './modules/message/interfaces/page.module';
+import { EventBus, EVENT_BUS } from './shared/events/event-bus';
 
 @Module({
   imports: [

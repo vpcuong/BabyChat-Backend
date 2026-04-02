@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
+import { GlobalExceptionFilter } from './shared/filters/http-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
 import * as morgan from 'morgan'
 
